@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import secrets
 from abc import ABC, abstractmethod
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, url_for, make_response, flash
@@ -12,7 +13,7 @@ DB_PATH = 'data.db'
 # Simple in-memory session store.
 # Each entry: token -> {user_id, username, role}
 sessions = {}
-_token_counter = 1000
+
 
 
 def create_session(user_id, username, role):
@@ -27,9 +28,7 @@ def create_session(user_id, username, role):
         username -- the user's username string
         role     -- the user's role string, either 'user' or 'sysop'
     """
-    global _token_counter
-    token = str(_token_counter)
-    _token_counter += 1
+    token = secrets.token_hex(16)
     sessions[token] = {'user_id': user_id, 'username': username, 'role': role}
     return token
 

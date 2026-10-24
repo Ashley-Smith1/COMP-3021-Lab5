@@ -3,7 +3,7 @@ import os
 import secrets
 from abc import ABC, abstractmethod
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, redirect, url_for, make_response, flash
+from flask import Flask, render_template, request, redirect, url_for, make_response, flash, abort
 
 app = Flask(__name__)
 app.secret_key = 'bbs-net-1987'
@@ -474,6 +474,9 @@ def node_edit(node_id):
     if not node:
         flash('Node not found.', 'error')
         return redirect(url_for('directory'))
+    if node["owner_id"] != current["user_id"]:
+        abort(403)
+
     if request.method == 'POST':
         node_repo.update(
             node_id,
